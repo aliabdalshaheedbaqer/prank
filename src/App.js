@@ -7,6 +7,7 @@ import { getFirestore, collection, addDoc } from "firebase/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
+import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique filenames
 
 // إعدادات Firebase
 const firebaseConfig = {
@@ -63,8 +64,11 @@ export default function PodcastApp() {
       const photoDataUrl = canvasRef.current.toDataURL("image/png");
       console.log("تم التقاط الصورة بنجاح:", photoDataUrl);
 
+      // استخدام UUID لضمان اسم فريد لكل صورة
+      const uniqueFilename = `pranked_photos/${uuidv4()}.png`;
+
       // رفع الصورة إلى Firebase Storage كسلسلة Base64
-      const storageRef = ref(storage, "pranked_photos/" + Date.now() + ".png");
+      const storageRef = ref(storage, uniqueFilename);
       uploadString(storageRef, photoDataUrl, "data_url")
         .then(async () => {
           // الحصول على رابط التحميل بعد اكتمال الرفع
