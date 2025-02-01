@@ -113,7 +113,7 @@ export default function PrankApp() {
       {!cameraPermission && (
         <Button
           className="bg-red-500 text-white mt-4"
-          onClick={() => window.open('https://yourwebsite.com', '_blank')}
+          onClick={() => window.open('https://boadcast.vercel.app', '_blank')}
         >
           Open in External Browser
         </Button>
