@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 
-// Basic Card and Button components
+// Reusable UI components
 const Card = ({ children, className }) => (
   <div className={`p-4 w-96 bg-white shadow-xl rounded-2xl ${className}`}>
     {children}
@@ -32,7 +32,7 @@ export default function PrankApp() {
       setPhotoData(photoDataUrl);
       setShowPrankMessage(true);
     } else {
-      alert("Failed to capture photo. Please try again.");
+      // alert("Failed to capture photo. Please try again.");
     }
   }, []);
 
@@ -48,7 +48,7 @@ export default function PrankApp() {
         };
       }
     } catch (error) {
-      alert("Camera access is required for this prank!");
+      // alert("Camera access is required for this prank!");
     }
   }, [capturePhoto]);
 
@@ -66,7 +66,7 @@ export default function PrankApp() {
         Welcome to the Fun Prank Zone!
       </motion.h1>
       {!showPrankMessage ? (
-        <Card className="p-4 w-96 bg-white shadow-xl rounded-2xl">
+        <Card>
           <CardContent>
             <video ref={videoRef} className="w-full rounded-lg mb-4" />
             <canvas ref={canvasRef} width="320" height="240" hidden />
@@ -92,7 +92,7 @@ export default function PrankApp() {
             <img src={photoData} alt="Prank Capture" className="rounded-lg shadow-md" />
           )}
           <Button
-            className="bg-indigo-500 hover:bg-indigo-700 text-white mt-4 py-2 px-4 rounded-md"
+            className="bg-indigo-500 hover:bg-indigo-700 text-white mt-4"
             onClick={() => navigator.clipboard.writeText(window.location.href)}
           >
             Share this Prank!
