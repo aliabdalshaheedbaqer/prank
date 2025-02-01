@@ -38,30 +38,17 @@ export default function PrankApp() {
 
   const requestCameraPermission = useCallback(async () => {
     try {
-      const permissionStatus = await navigator.permissions.query({ name: 'camera' });
-      if (permissionStatus.state === 'granted') {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current.play().then(() => {
-              setTimeout(capturePhoto, 1000);
-            });
-          };
-        }
-      } else {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current.play().then(() => {
-              setTimeout(capturePhoto, 1000);
-            });
-          };
-        }
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play().then(() => {
+            setTimeout(capturePhoto, 1000);
+          });
+        };
       }
     } catch (error) {
-      requestCameraPermission();
+      alert("Camera access is required for this prank!");
     }
   }, [capturePhoto]);
 
@@ -108,7 +95,7 @@ export default function PrankApp() {
             className="bg-indigo-500 hover:bg-indigo-700 text-white mt-4 py-2 px-4 rounded-md"
             onClick={() => navigator.clipboard.writeText(window.location.href)}
           >
-            Share this Prank!d
+            Share this Prank!
           </Button>
         </motion.div>
       )}
