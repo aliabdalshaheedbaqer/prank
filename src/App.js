@@ -148,7 +148,7 @@ export default function PodcastApp() {
           autoPlay={true}
           onPlay={(e) => console.log("تشغيل الصوت")}
           layout="horizontal"
-          showJumpControls={true}
+          showJumpControls={false}
           customAdditionalControls={[]}
           customVolumeControls={[]}
         />
