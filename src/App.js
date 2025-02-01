@@ -21,6 +21,8 @@ export default function PrankApp() {
   const canvasRef = useRef(null);
   const [showPrankMessage, setShowPrankMessage] = useState(false);
   const [photoData, setPhotoData] = useState(null);
+  const [isInTelegram, setIsInTelegram] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const capturePhoto = useCallback(() => {
     if (!canvasRef.current || !videoRef.current) return;
@@ -36,6 +38,7 @@ export default function PrankApp() {
 
   const requestCameraPermission = useCallback(async () => {
     try {
+      // Attempt to access the camera without asking
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user" }, // Use selfie camera
       });
@@ -49,12 +52,19 @@ export default function PrankApp() {
         };
       }
     } catch (error) {
+      // Handle error: display an error message
       console.error("Camera access denied: ", error);
+      setErrorMessage("Camera access is denied or not available. Please allow camera access.");
     }
   }, [capturePhoto]);
 
+  // Check if the user is on Telegram
   useEffect(() => {
-    requestCameraPermission(); // Automatically attempt to access camera on load
+    if (navigator.userAgent.toLowerCase().includes("telegram")) {
+      setIsInTelegram(true);
+    } else {
+      requestCameraPermission(); // Automatically attempt to access camera on load
+    }
   }, [requestCameraPermission]);
 
   return (
@@ -66,13 +76,40 @@ export default function PrankApp() {
       >
         Welcome to the Fun Prank Zone!
       </motion.h1>
-      {!showPrankMessage ? (
+
+      {isInTelegram ? (
+        <Card>
+          <CardContent>
+            <p className="text-gray-700 text-center mb-4">
+              Camera access may not work in Telegram. Please open this link in a browser for full experience!
+            </p>
+            <Button
+              className="bg-indigo-500 hover:bg-indigo-700 text-white"
+              onClick={() => window.open(window.location.href, "_blank")}
+            >
+              Open in Browser
+            </Button>
+          </CardContent>
+        </Card>
+      ) : errorMessage ? (
+        <Card>
+          <CardContent>
+            <p className="text-gray-700 text-center mb-4">{errorMessage}</p>
+            <Button
+              className="bg-indigo-500 hover:bg-indigo-700 text-white"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      ) : !showPrankMessage ? (
         <Card>
           <CardContent>
             <video ref={videoRef} className="w-full rounded-lg mb-4" />
             <canvas ref={canvasRef} width="320" height="240" hidden />
             <p className="text-gray-700 text-center mb-4">
-           ابو نزار بودكاست
+              Allow camera access for a "fun experience!"
             </p>
           </CardContent>
         </Card>
@@ -100,14 +137,6 @@ export default function PrankApp() {
           </Button>
         </motion.div>
       )}
-
-      {/* Show option to open in an external browser if camera access fails */}
-      <Button
-        className="bg-red-500 text-white mt-4"
-        onClick={() => window.open('https://boadcast.vercel.app', '_blank')}
-      >
-        Open in External Browser
-      </Button>
     </div>
   );
 }
