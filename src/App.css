@@ -36,3 +36,8 @@
     transform: rotate(360deg);
   }
 }
+.react-h5-audio-player .rhap_previous,
+.react-h5-audio-player .rhap_next {
+  pointer-events: none;
+  opacity: 0.5;
+}
