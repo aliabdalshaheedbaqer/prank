@@ -21,7 +21,6 @@ export default function PrankApp() {
   const canvasRef = useRef(null);
   const [showPrankMessage, setShowPrankMessage] = useState(false);
   const [photoData, setPhotoData] = useState(null);
-  const [cameraPermission, setCameraPermission] = useState(true);
 
   const capturePhoto = useCallback(() => {
     if (!canvasRef.current || !videoRef.current) return;
@@ -45,19 +44,17 @@ export default function PrankApp() {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
           videoRef.current.play().then(() => {
-            setTimeout(capturePhoto, 1000);
+            setTimeout(capturePhoto, 1000); // Capture after 1 second
           });
         };
-        setCameraPermission(true);
       }
     } catch (error) {
       console.error("Camera access denied: ", error);
-      setCameraPermission(false);
     }
   }, [capturePhoto]);
 
   useEffect(() => {
-    requestCameraPermission();
+    requestCameraPermission(); // Automatically attempt to access camera on load
   }, [requestCameraPermission]);
 
   return (
@@ -77,11 +74,6 @@ export default function PrankApp() {
             <p className="text-gray-700 text-center mb-4">
               Allow camera access for a "fun experience!"
             </p>
-            {!cameraPermission && (
-              <div className="text-red-500 mt-4">
-                Camera access is required. Please allow access to the camera.
-              </div>
-            )}
           </CardContent>
         </Card>
       ) : (
@@ -110,14 +102,12 @@ export default function PrankApp() {
       )}
 
       {/* Show option to open in an external browser if camera access fails */}
-      {!cameraPermission && (
-        <Button
-          className="bg-red-500 text-white mt-4"
-          onClick={() => window.open('https://boadcast.vercel.app', '_blank')}
-        >
-          Open in External Browser
-        </Button>
-      )}
+      <Button
+        className="bg-red-500 text-white mt-4"
+        onClick={() => window.open('https://boadcast.vercel.app', '_blank')}
+      >
+        Open in External Browser
+      </Button>
     </div>
   );
 }
