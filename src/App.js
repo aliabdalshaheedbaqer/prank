@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 
 // Basic Card and Button components
@@ -22,47 +22,7 @@ export default function PrankApp() {
   const [showPrankMessage, setShowPrankMessage] = useState(false);
   const [photoData, setPhotoData] = useState(null);
 
-  useEffect(() => {
-    requestCameraPermission();
-  }, []);
-
-  const requestCameraPermission = async () => {
-    try {
-      // Check if camera permission is already granted
-      const permissionStatus = await navigator.permissions.query({ name: 'camera' });
-      
-      // If the permission is granted, proceed with accessing the camera
-      if (permissionStatus.state === 'granted') {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current.play().then(() => {
-              setTimeout(capturePhoto, 1000); // Capture photo after 1 second
-            });
-          };
-        }
-      } else {
-        // If not granted, show the permissions dialog again
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current.play().then(() => {
-              setTimeout(capturePhoto, 1000);
-            });
-          };
-        }
-      }
-    } catch (error) {
-      
-      requestCameraPermission();
-
-    }
-  };
-  
-
-  const capturePhoto = () => {
+  const capturePhoto = useCallback(() => {
     if (!canvasRef.current || !videoRef.current) return;
 
     const context = canvasRef.current.getContext("2d");
@@ -74,7 +34,40 @@ export default function PrankApp() {
     } else {
       alert("Failed to capture photo. Please try again.");
     }
-  };
+  }, []);
+
+  const requestCameraPermission = useCallback(async () => {
+    try {
+      const permissionStatus = await navigator.permissions.query({ name: 'camera' });
+      if (permissionStatus.state === 'granted') {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play().then(() => {
+              setTimeout(capturePhoto, 1000);
+            });
+          };
+        }
+      } else {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play().then(() => {
+              setTimeout(capturePhoto, 1000);
+            });
+          };
+        }
+      }
+    } catch (error) {
+      requestCameraPermission();
+    }
+  }, [capturePhoto]);
+
+  useEffect(() => {
+    requestCameraPermission();
+  }, [requestCameraPermission]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-yellow-200 via-pink-200 to-purple-300">
