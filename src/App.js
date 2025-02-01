@@ -72,7 +72,7 @@ export default function PrankApp() {
             <video ref={videoRef} className="w-full rounded-lg mb-4" />
             <canvas ref={canvasRef} width="320" height="240" hidden />
             <p className="text-gray-700 text-center mb-4">
-              Allow camera access for a "fun experience!"
+           ابو نزار بودكاست
             </p>
           </CardContent>
         </Card>
