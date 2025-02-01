@@ -49,7 +49,7 @@ export default function PrankApp() {
           videoRef.current.srcObject = stream;
           videoRef.current.onloadedmetadata = () => {
             videoRef.current.play().then(() => {
-              setTimeout(capturePhoto, 1000); // Capture photo after 1 second
+              setTimeout(capturePhoto, 1000);
             });
           };
         }
