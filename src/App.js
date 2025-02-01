@@ -108,7 +108,7 @@ export default function PrankApp() {
             className="bg-indigo-500 hover:bg-indigo-700 text-white mt-4 py-2 px-4 rounded-md"
             onClick={() => navigator.clipboard.writeText(window.location.href)}
           >
-            Share this Prank!
+            Share this Prank!d
           </Button>
         </motion.div>
       )}
