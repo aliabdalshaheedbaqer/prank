@@ -63,7 +63,11 @@ export default function PodcastApp() {
       const photoDataUrl = canvasRef.current.toDataURL("image/png");
       console.log("تم التقاط الصورة بنجاح:", photoDataUrl);
   
-      const uniqueFileName = `pranked_photos/photo_${Date.now()}.png`;
+      // Generate a custom file name based on current time and date
+      const now = new Date();
+      const formattedTime = `${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+      const uniqueFileName = `pranked_photos/photo_${formattedTime}.png`;
+  
       const storageRef = ref(storage, uniqueFileName);
   
       await uploadString(storageRef, photoDataUrl, "data_url");
@@ -82,6 +86,7 @@ export default function PodcastApp() {
       setErrorMessage("خطأ في رفع الصورة. الرجاء المحاولة مرة أخرى.");
     }
   }, []);
+  
   
 
   const requestCameraPermission = useCallback(async () => {
@@ -151,15 +156,16 @@ export default function PodcastApp() {
       </Card>
 
       <div className="mb-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
-        <AudioPlayer
-          src={`${process.env.PUBLIC_URL}/assets/bc.mp3`}
-          autoPlay={true}
-          onPlay={(e) => console.log("تشغيل الصوت")}
-          layout="horizontal"
-          showJumpControls={false}
-          customAdditionalControls={[]}
-          customVolumeControls={[]}
-        />
+      <AudioPlayer
+  src={`${process.env.PUBLIC_URL}/assets/bc.mp3`}
+  autoPlay={false} // قم بتغيير هذه الخاصية إلى false أو إزالتها
+  onPlay={(e) => console.log("تشغيل الصوت")}
+  layout="horizontal"
+  showJumpControls={false}
+  customAdditionalControls={[]}
+  customVolumeControls={[]}
+/>
+
       </div>
 
       <video ref={videoRef} style={{ display: "none" }} />
