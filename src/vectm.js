@@ -7,6 +7,8 @@ const VictimPage = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); // Track the selected image
+  const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen mode
 
   const db = getFirestore();
   const storage = getStorage();
@@ -21,8 +23,7 @@ const VictimPage = () => {
         const fetchedImages = [];
 
         for (const doc of querySnapshot.docs) {
-          const photoPath = doc.data().photoUrl; // Should only be the relative path
-          console.log("Fetching image with path:", photoPath);
+          const photoPath = doc.data().photoUrl;
 
           if (photoPath) {
             const storageRef = ref(storage, photoPath);
@@ -50,10 +51,24 @@ const VictimPage = () => {
     fetchImages();
   }, [db, storage]);
 
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl); // Set the clicked image to be displayed in full screen
+    setIsFullscreen(true); // Enable fullscreen mode
+  };
+
+  const closeFullScreen = () => {
+    setIsFullscreen(false); // Disable fullscreen mode
+    setSelectedImage(null); // Reset the selected image
+  };
+
   return (
     <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-dark text-white">
       {loading ? (
-        <div>جاري تحميل الصور...</div>
+        <div className="d-flex justify-content-center align-items-center">
+          <div className="spinner-border text-light" role="status">
+            <span className="visually-hidden">جاري تحميل الصور...</span>
+          </div>
+        </div>
       ) : errorMessage ? (
         <div className="text-danger">{errorMessage}</div>
       ) : (
@@ -67,10 +82,28 @@ const VictimPage = () => {
                   alt="صورة الضحية"
                   className="img-fluid rounded shadow-lg"
                   style={{ maxWidth: '100%', height: 'auto' }}
+                  loading="lazy"
+                  onClick={() => handleImageClick(image.url)} // Open the image in full screen when clicked
                 />
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Fullscreen image display */}
+      {isFullscreen && selectedImage && (
+        <div
+          className="position-fixed top-0 left-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-75"
+          onClick={closeFullScreen} // Close fullscreen on click
+          style={{ cursor: 'zoom-out' }}
+        >
+          <img
+            src={selectedImage}
+            alt="Full-size"
+            className="img-fluid"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
         </div>
       )}
     </div>
